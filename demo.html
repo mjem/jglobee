@@ -1,0 +1,49 @@
+<html>
+  <head>
+	<meta charset="utf-8" />
+	<style>
+		#container {
+			background: #000;
+			width: 900px;
+			height: 900px;
+		}
+	</style>
+  </head>
+  <body>
+	<div id="container"></div>
+  </body>
+  <script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+  <script src="js/three.min.js" type="text/javascript"></script>
+  <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r58/three.min.js" type="text/javascript"></script> -->
+  <script src="js/OrbitControls.js" type="text/javascript"></script>
+  <script src="js/jglobee.js" type="text/javascript"></script>
+  <script>
+$(function(){
+	var madrid = {id:'madrid',
+				  color: 0x00ffff,
+				  radius: 1,
+				  lat: 40.24,
+				  lon: -3.41};
+
+	var scicily = {color: 0x00ff00,
+				   radius: 1,
+				   lat: 37,
+				   lon: 14};
+
+	var newyork = {color: 0xffff00,
+				   radius: 1,
+				   lat: 43,
+				   lon: -75};
+
+	things = [madrid,
+			 scicily,
+			 newyork]
+
+	$('#container').jglobee({earthTexture: 'img/PathfinderMap.jpeg',
+// earthNormal
+// earthSpecular
+							 things: things,
+							 sun: true});
+});
+</script>
+</html>
