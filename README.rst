@@ -4,15 +4,15 @@ jGlobee
 Introduction
 ------------
 
-jGlobee is a `jQuery <http://jquery.com>`_ plugin which renders an interactive
-3d Earth model inside an HTML ``<div>`` element using WebGL via `three.js
+A `jQuery <http://jquery.com>`_ plugin which renders an interactive 3d Earth
+model inside an HTML ``<div>`` element using WebGL via `three.js
 <http://threejs.org>`_.
 
 The user can spin, zoom, and pan the camera around the scene.
 
-Construction parameters can be used to control the texture maps, Sun
-visibility and to add artifacts to the scene. Each artifact is a solid
-sphere with a configurable position (latitude/longitude), size and colour.
+Construction parameters can be used to control the texture maps, Sun visibility
+and to add artifacts to the scene. Each artifact is a sphere with a configurable
+position (latitude/longitude), size and colour.
 
 Gallery
 -------
@@ -24,39 +24,36 @@ Gallery
 Demo
 ----
 
-See `demo <demo.html>`_.
+See a `sample <demo.html>`_ page inside the repository. For a live demo see
+http://mjem.github.io/jglobee/demo.html.
 
 Example
 -------
 
-Set up the control rendering to a ``div`` named ``container`` with 3 cities highlighted:
+Set up the control rendering to a ``div`` named *container* with 3 cities highlighted:
 
   .. code:: javascript
 
-    var madrid = {id:'madrid',
-                  color: 0x00ffff,
+    var madrid = {color: 0x00ffff,
                   radius: 1,
                   lat: 40.24,
                   lon: -3.41};
     var scicily = {color: 0x00ff00,
                    radius: 1,
-                   lat: 37,
-                   lon: 14};
+                   lat: 37.0,
+                   lon: 14.0};
     var newyork = {color: 0xffff00,
                    radius: 1,
-                   lat: 43,
-                   lon: -75};
-    cities = [madrid,
-              scicily,
-              newyork]
-    $('#container').jglobee({artifacts: cities});
+                   lat: 43.0,
+                   lon: -75.0};
+    $('#container').jglobee({artifacts: [madrid, scicily, newyork]});
 
 
 Prerequisites
 -------------
 
 The plugin requires a browser with WebGL support (obviously), ``jQuery``, ``three`` and the
-plugin ``OrbitControls.js`` from the ``examples`` directory of the ``three`` distribution.
+extension ``OrbitControls.js`` from the *examples* directory of the ``three`` distribution.
 
 For example a suitable set of includes would be:
 
@@ -76,20 +73,23 @@ earthTexture
     Name of the main Earth texture map to use. If omitted ``img/Pathfinder.jpeg`` is used.
 
 earthNormal
-    Name of an image to use as a normal map. If omitted is used.
+    Name of an image to use as a normal map. If omitted ``img/EarthNormal-medres.jpeg`` is used.
+	Set to ``null`` to disable normal mapping.
 
 earthSpecular
-    Name of an image to use as the specular map. If omitted is used.
+    Name of an image to use as the specular map. If omitted ``img/EarthSpecular.png`` is used.
+	Set to ``null`` to disable specular mapping.
 
 sun
-    Boolean specifying if the Sun should be included in the scene. Default is true.
+    Boolean specifying if the Sun should be included in the scene. Default is ``true``.
+	If ``false`` then normal and specular mapping should also be disabled as they have no effect.
 
 artifacts
     A list of items to display on the surface of the rendered Earth. Each artifact is a hash
-    containing:
+	and must contain:
 
     color
-        Required color as a numerical value e.g. 0x00ff00 for pure green.
+        Color as a numerical value e.g. ``0x00ff00`` for pure green.
 
     radius
          Size of the artifact. ``1`` is about the size of a major city.
@@ -103,27 +103,25 @@ artifacts
 Textures
 --------
 
-In the ``img`` directory are 3 texture files:
+In the *img* directory are 3 texture files:
 
 `PathfinderMap.jpeg <img/PathfinderMap.jpeg>`_
     A 4096x2048 resolution true colour, cloud free cylindrical Earth texture
-    with no ocean markings built from NOAA AVHRR data.
-    Available copyright free from http://www.evl.uic.edu/pape/data/Earth courtesy of Dave Pope,
-    NASA/GSFC. NASA does not endorse this software in any way.
+    with no ocean markings built from NOAA AVHRR data. Original data available copyright free
+    from http://www.evl.uic.edu/pape/data/Earth and converted to an image by Dave Pope, NASA/GSFC.
 
 `EarthNormal-medres.jpeg <img/EarthNormal-medres.jpeg>`_
-    A 4096x2048 normal map of the Earth.
-    Created using original NASA data from http://mirrors.arsc.edu/nasa/topography by John k. Van Vliet.
-    This and other normal maps available from
-    http://www.celestiamotherlode.net/catalog/earthbumpspec.php.
-    The high resolution map gives slighly better image quality at a considerable cost to page loading
-    times.
+    A 4096x2048 normal map of the Earth created using original NASA data from
+	http://mirrors.arsc.edu/nasa/topography by John k. Van Vliet. This and other normal maps
+	available from http://www.celestiamotherlode.net/catalog/earthbumpspec.php.
+    The high resolution map gives slighly better image quality at a considerable cost to page
+	loading times.
 
 `EarthSpecular.png <img/EarthSpecular.png>`_
-    A 1024x512 specular map of the Earth with fully reflective oceans and
-    partially reflective land. Created using original NASA data by Jestr <jestr@ntlworld.com>
-    and available from http://www.celestiamotherlode.net/catalog/earthbumpspec.php.
-    Images recoloured myself to increase the land reflectivness.
+    A 1024x512 specular map of the Earth with fully reflective oceans and partially reflective land.
+	Created using original NASA data by Jestr <jestr@ntlworld.com> and available from
+	http://www.celestiamotherlode.net/catalog/earthbumpspec.php. Images recoloured myself to
+	increase the land reflectivness.
 
 Other textures
 --------------
@@ -131,7 +129,8 @@ Other textures
 A set of very high resolution, colourful Earth textures is available from
 the page of Paul Illsley at http://www.paulillsley.com/gia.
 
-The NASA Blue Marble images are available as cylindrical maps from http://visibleearth.nasa.gov.
+The NASA Blue Marble images are available as cylindrical image projections from
+http://visibleearth.nasa.gov.
 
 Other textures are available.
 
@@ -142,6 +141,8 @@ See http://github.com/mjem/jglobee.
 
 Legal
 -----
+
+NASA does not endorse this software in any way.
 
 jGlobee is copyright 2013 Mike Elson
 
