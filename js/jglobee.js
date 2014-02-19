@@ -1,6 +1,36 @@
+var global;
+
 (function($) {
+	// pads left
+	lpad = function(str, length, fillChar) {
+		// var str = this;
+		while (str.length < length) {
+			str = fillChar + str;
+		}
+		return str;
+	}
+
 	$.fn.jglobee = function(options) {
 		var container = this;
+
+		// showLegend
+		// earthTexture
+		// earthNormal
+		// earthSpecular
+		// sun
+		// artifacts
+		//  id
+		//  color
+		//  radius
+		//  legend
+		//  lat
+		//  lon
+
+		// legend must be single
+		// color must be single
+		// id, radius, lat and lon can be single or arrays
+		// id, lat, lon must either be all single or all arrays
+		// radius independantly can be single or array
 
 		// Define our default settings
 		var defaults = {
@@ -21,7 +51,9 @@
 			// if ( Detector.webgl )
 				// renderer = new THREE.WebGLRenderer( {antialias:true} );
 			// else
-				// renderer = new THREE.CanvasRenderer();
+		// renderer = new THREE.CanvasRenderer();
+
+		global = renderer;
 
 		renderer.setSize(container.width(), container.height());
 
@@ -45,11 +77,35 @@
 			scene.add(camera);
 			return camera;
 		};
-
 		var camera = addCamera();
 
 		// attach ourselves to the browser DOM tree
 		container.append(renderer.domElement);
+
+		// compile the legend
+		var legend = '<table class="jglobee">'
+		console.log('init ' + legend);
+		settings.artifacts.forEach(function(elem) {
+			var color = elem.color,
+				text = elem.legend || elem.id;
+			if (color && text) {
+				console.log('Legend ' + color + ' : ' + text);
+			}
+			legend += '<tr><td style="width:1.2em;background-color:#' +
+				lpad(color.toString(16), 6,'0') +
+				'">&nbsp;</td><td>' +
+				text +
+				'</td></tr>';
+			console.log('prog ' + legend);
+		});
+		var gl = renderer.getContext();
+		console.log('gl ' + gl);
+		console.log('max texture ' + gl.MAX_TEXTURE_SIZE);
+		console.log('size ' + gl.getParameter(gl.MAX_TEXTURE_SIZE));
+		legend += '<p>Max texture size ' + gl.getParameter(gl.MAX_TEXTURE_SIZE) + '</p>';
+		var $legend = document.createElement('div');
+		$legend.innerHTML = legend;
+		container.get()[0].appendChild($legend);
 
 		// Create the main Earth sphere
 		var addEarth = function() {
@@ -219,6 +275,34 @@
 
 		// All done
 		animate();
+
+/*		var text = 'Hellola';
+		var font = 'Helvetica';
+		var size = 18;
+		var color = '#676767';
+		font = 'bold ' + size + 'px ' + font;
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
+		context.font = font;
+		var metrics = context.measureText(text);
+		var textWidth = metrics.width;
+		canvas.width = textWidth + 3;
+		canvas.height = size + 3;
+
+		context.font = font;
+		context.fillStyle = color;
+		context.fillText(text, 0, size + 3);
+
+		var texture = new THREE.Texture(canvas);
+		texture.needsUpdate = true;
+		var mesh = THREE.Mesh(
+			new THREE.PlaneGeometry(canvas.width, canvas.height),
+			new THREE.MeshBasicMaterial({
+				map: texture,
+				side: THREE.DoubleSide
+			}));*/
+		
+		
 		return container;
 	};
 }(jQuery));

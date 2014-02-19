@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
 	<meta charset="utf-8" />
 	<style>
@@ -11,29 +12,41 @@
   </head>
   <body>
 	<div id="container"></div>
+	<!-- <div style="float:left" ><p>joly</p></div> -->
   </body>
-  <script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+  <script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
   <script src="js/three.min.js" type="text/javascript"></script>
   <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r58/three.min.js" type="text/javascript"></script> -->
   <script src="js/OrbitControls.js" type="text/javascript"></script>
   <script src="js/jglobee.js" type="text/javascript"></script>
   <script>
 $(function(){
-	var madrid = {id:'madrid',
+	var madrid = {id: 'madrid',
+				  legend: 'Madrid',
 				  color: 0x00ffff,
 				  radius: 1,
 				  lat: 40.24,
 				  lon: -3.41};
 
 	var scicily = {color: 0x00ff00,
+				   id: 'scicily', 
+				   /* legend: 'Scicily', */
 				   radius: 1,
 				   lat: 37,
 				   lon: 14};
 
 	var newyork = {color: 0xffff00,
+				   legend: 'New York',
 				   radius: 1,
 				   lat: 43,
 				   lon: -75};
+
+	var others = {color: 0xffffff,
+				  id: 'Others',
+				  legend: 'Small cities',
+				  radius: 0.5,
+				  lat: [],
+				  lon: []};
 
 	things = [madrid,
 			 scicily,
