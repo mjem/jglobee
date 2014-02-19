@@ -1,0 +1,16 @@
+{
+	"name": "jglobee",
+	"title": "jGlobee",
+	"description": "A jQuery plugin to render an interactive 3d Earth inside an element, with optional markers on the surface",
+	"keywords": ["earth", "3d", "webgl", "three", "three.js", "javascript", "html"],
+	"version": "0.2.0",
+	"author": {"Mike Elson <mike.elson@gmail.com>"},
+	"licenses": ["Apache 2.0"],
+	"homepage": "github.com/mjem/jglobee",
+	"docs": "",
+	"downloads": "",
+	"dependancies": {
+		"jquery": "",
+		"three": ""
+	}
+}

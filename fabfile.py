@@ -11,12 +11,6 @@ from fabric.api import env
 from fabric.api import path
 from fabric.api import local
 
-def build():
-	"""Build derived files"""
-
-	local('chart/tools/build.sh')
-
-
 def commit(comment='checkpoint'):
 	"""Commit local changes.
 	Usage: fab commit:"Hello this message"
