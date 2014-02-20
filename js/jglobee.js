@@ -35,12 +35,14 @@ var global;
 		// Define our default settings
 		var defaults = {
 			earthTexture: 'img/PathfinderMap.jpeg',
+			earthTexture2k: 'img/PathfinderMap-lowres.jpeg',
 			earthNormal: 'img/EarthNormal-medres.jpeg',
+			earthNormal2k: 'img/EarthNormal-lowres.jpeg',
 			earthSpecular: 'img/EarthSpecular.png',
 			sun: true,
 			// ambientLight: 0xdddddd,
 			artifacts: []
-			};
+		};
 
 		// Merge in the user settings
 		var settings = $.extend({}, defaults, options);
@@ -48,17 +50,18 @@ var global;
 		// Initialise an WebGL renderer
 		var renderer = new THREE.WebGLRenderer({antialias:true});
 		// create and start the renderer; choose antialias setting.
-			// if ( Detector.webgl )
-				// renderer = new THREE.WebGLRenderer( {antialias:true} );
-			// else
+		// if ( Detector.webgl )
+		// renderer = new THREE.WebGLRenderer( {antialias:true} );
+		// else
 		// renderer = new THREE.CanvasRenderer();
-
-		global = renderer;
-
+		// global = renderer;
 		renderer.setSize(container.width(), container.height());
 
 		// Create an empty scene
 		var scene = new THREE.Scene();
+
+		// With ambient lighting
+		scene.add(new THREE.AmbientLight(0x333333));
 
 		// Initialise a camera
 		var addCamera = function() {
@@ -74,7 +77,7 @@ var global;
 													 FAR);
 
 			camera.position.set(150, 75, 0);
-			scene.add(camera);
+			// scene.add(camera);
 			return camera;
 		};
 		var camera = addCamera();
@@ -82,7 +85,7 @@ var global;
 		// attach ourselves to the browser DOM tree
 		container.append(renderer.domElement);
 
-		// compile the legend
+		// compile the legend into an HTML table below the main scene
 		var legend = '<table class="jglobee">'
 		console.log('init ' + legend);
 		settings.artifacts.forEach(function(elem) {
@@ -99,13 +102,14 @@ var global;
 			console.log('prog ' + legend);
 		});
 		var gl = renderer.getContext();
-		console.log('gl ' + gl);
-		console.log('max texture ' + gl.MAX_TEXTURE_SIZE);
-		console.log('size ' + gl.getParameter(gl.MAX_TEXTURE_SIZE));
 		legend += '<p>Max texture size ' + gl.getParameter(gl.MAX_TEXTURE_SIZE) + '</p>';
 		var $legend = document.createElement('div');
 		$legend.innerHTML = legend;
 		container.get()[0].appendChild($legend);
+
+		var max_texture_size = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+		var two_k_textures = (max_texture_size == 2048);
+		console.log('max_texture_size ' + max_texture_size);
 
 		// Create the main Earth sphere
 		var addEarth = function() {
@@ -116,13 +120,22 @@ var global;
 				rings=radius;
 
 			// Always load a main texture
-			var earthTexture = THREE.ImageUtils.loadTexture(settings.earthTexture);
+			var earthTexture;
+			if (two_k_textures) {
+				earthTexture = THREE.ImageUtils.loadTexture(settings.earthTexture2k);
+			} else {
+				earthTexture = THREE.ImageUtils.loadTexture(settings.earthTexture);
+			}
 			// earthTexture.anisotropy = 16;
 
 			// Normal map is optional
-			var earthNormal = null;
+			var normalTexture = null;
 			if (settings.earthNormal) {
-				var normalTexture = THREE.ImageUtils.loadTexture(settings.earthNormal);
+				if (two_k_textures) {
+					normalTexture = THREE.ImageUtils.loadTexture(settings.earthNormal2k);
+				} else {
+					normalTexture = THREE.ImageUtils.loadTexture(settings.earthNormal);
+				}
 			}
 
 			// Specular map is optional
@@ -137,10 +150,10 @@ var global;
 				map: earthTexture,
 				normalMap: normalTexture,
 				specularMap: specularTexture,
-				ambient: 0xffffff,
-				color: 0x808080,
-				specular: 0xffff80, // change the size of the reflected Sun
-				shininess: 30
+				// ambient: 0xffffff,
+				// color: 0x808080,
+				// specular: 0xffff80, // change the size of the reflected Sun
+				// shininess: 10
 				// emissive: 0x808080
 			});
 
@@ -151,7 +164,6 @@ var global;
 			// Insert outselves into the scene
 			scene.add(sphere);
 		};
-
 		addEarth();
 
 		// A list of 3d-objects which can receive mouse clicks
@@ -167,10 +179,10 @@ var global;
 
 			// create the visible part of the artifact
 			var sphere = new THREE.Mesh(new THREE.SphereGeometry(
-					thing.radius,
-					thing.radius*4,  // segments
-					thing.radius*4),  // rings
-				material);
+				thing.radius,
+				thing.radius*4,  // segments
+				thing.radius*4),  // rings
+										material);
 
 			// Offset it to the north pole
 			sphere.position.x = thing.height || 50;
@@ -215,7 +227,8 @@ var global;
 
 		// Add the Sun as oth a visible sphere and as a source of lighting
 		var addSun = function() {
-			var sunLight = new THREE.PointLight(0xffff80);
+			var sunLight = new THREE.PointLight(0xffffff,1 );
+			// var sunLight = new THREE.PointLight(0xffff80);
 			sunLight.position.set(-100, 200, 100);
 			scene.add(sunLight);
 
@@ -224,15 +237,49 @@ var global;
 				emissive: 0xffff00
 			});
 
-			var sunSphere = new THREE.Mesh(new THREE.SphereGeometry(10,	10, 10),
+			var sunSphere = new THREE.Mesh(new THREE.SphereGeometry(15,	15, 15),
 										   sunMaterial);
 			sunSphere.position.set(-100, 200, 100);
 			scene.add(sunSphere);
 		};
-
 		if (settings.sun) {
 			addSun();
 		}
+
+		var addStars = function() {
+			// create the particle variables
+			var particleCount = 400,
+				particles = new THREE.Geometry(),
+				pMaterial = new THREE.ParticleBasicMaterial({
+					color: 0xFFFFFF,
+					size: 1
+				});
+
+			// now create the individual particles
+			for (var p = 0; p < particleCount; p++) {
+
+				// create a particle with random
+				// position values, -250 -> 250
+				var pX = Math.random() * 1000 - 500,
+					pY = Math.random() * 1000 - 500,
+					pZ = Math.random() * 1000 - 500,
+					particle = new THREE.Vertex(
+						new THREE.Vector3(pX, pY, pZ)
+					);
+
+				// add it to the geometry
+				particles.vertices.push(particle);
+			}
+
+			// create the particle system
+			var particleSystem = new THREE.ParticleSystem(
+				particles,
+				pMaterial);
+
+			// add it to the scene
+			scene.add(particleSystem);
+		}
+		// addStars();
 
 		// Convert mouse x,y clicks back to scene vectors
 		var projector = new THREE.Projector();
@@ -264,43 +311,43 @@ var global;
 		// Attempt to handle resizing... seems to detach the mouse controls though.
 		// Best to recreate the scene at application level
 		// function onResize() {
-			// var width = container.width();
-			// var height = container.height();
-			// console.log('Resize globe to ' + width + ' x ' + height);
-			// renderer.setSize(width, height);
-			// camera.aspect = width / height;
-			// camera.updateProjectionMatrix();
+		// var width = container.width();
+		// var height = container.height();
+		// console.log('Resize globe to ' + width + ' x ' + height);
+		// renderer.setSize(width, height);
+		// camera.aspect = width / height;
+		// camera.updateProjectionMatrix();
 		// controls = new THREE.OrbitControls(camera, renderer.domElement);
 		// window.addEventListener('resize', onResize, false);
 
 		// All done
 		animate();
 
-/*		var text = 'Hellola';
-		var font = 'Helvetica';
-		var size = 18;
-		var color = '#676767';
-		font = 'bold ' + size + 'px ' + font;
-		var canvas = document.createElement('canvas');
-		var context = canvas.getContext('2d');
-		context.font = font;
-		var metrics = context.measureText(text);
-		var textWidth = metrics.width;
-		canvas.width = textWidth + 3;
-		canvas.height = size + 3;
+		/*		var text = 'Hellola';
+				var font = 'Helvetica';
+				var size = 18;
+				var color = '#676767';
+				font = 'bold ' + size + 'px ' + font;
+				var canvas = document.createElement('canvas');
+				var context = canvas.getContext('2d');
+				context.font = font;
+				var metrics = context.measureText(text);
+				var textWidth = metrics.width;
+				canvas.width = textWidth + 3;
+				canvas.height = size + 3;
 
-		context.font = font;
-		context.fillStyle = color;
-		context.fillText(text, 0, size + 3);
+				context.font = font;
+				context.fillStyle = color;
+				context.fillText(text, 0, size + 3);
 
-		var texture = new THREE.Texture(canvas);
-		texture.needsUpdate = true;
-		var mesh = THREE.Mesh(
-			new THREE.PlaneGeometry(canvas.width, canvas.height),
-			new THREE.MeshBasicMaterial({
+				var texture = new THREE.Texture(canvas);
+				texture.needsUpdate = true;
+				var mesh = THREE.Mesh(
+				new THREE.PlaneGeometry(canvas.width, canvas.height),
+				new THREE.MeshBasicMaterial({
 				map: texture,
 				side: THREE.DoubleSide
-			}));*/
+				}));*/
 		
 		
 		return container;
