@@ -87,19 +87,19 @@ var global;
 
 		// compile the legend into an HTML table below the main scene
 		var legend = '<table class="jglobee">'
-		console.log('init ' + legend);
+		// console.log('init ' + legend);
 		settings.artifacts.forEach(function(elem) {
 			var color = elem.color,
 				text = elem.legend || elem.id;
 			if (color && text) {
-				console.log('Legend ' + color + ' : ' + text);
+				// console.log('legend ' + color + ' : ' + text);
 			}
 			legend += '<tr><td style="width:1.2em;background-color:#' +
 				lpad(color.toString(16), 6,'0') +
 				'">&nbsp;</td><td>' +
 				text +
 				'</td></tr>';
-			console.log('prog ' + legend);
+			// console.log('prog ' + legend);
 		});
 		var gl = renderer.getContext();
 		legend += '<p>Max texture size ' + gl.getParameter(gl.MAX_TEXTURE_SIZE) + '</p>';
@@ -170,6 +170,7 @@ var global;
 		var intersects = [];
 
 		// Insert an artifact into the scene at a lat/lon position
+		// `thing` should contain radius, lat, lon, color, height
 		var addThing = function(thing) {
 			// No need for fancy lighting for such small things
 			var material = new THREE.MeshLambertMaterial({
@@ -215,7 +216,17 @@ var global;
 
 		// Insert all the artifact things
 		for(var i=0; i<settings.artifacts.length; i++) {
-			addThing(settings.artifacts[i]);
+			var color = settings.artifacts[i].color;
+			var radius = settings.artifacts[i].radius;
+			for(var j=0; j<settings.artifacts[i].lat.length; j++) {
+				var thing = {
+					color: color,
+					radius: radius,
+					lat: settings.artifacts[i].lat[j],
+					lon: settings.artifacts[i].lon[j]}
+				console.log('Pushing thing ' + thing);
+				addThing(thing);
+			}
 		};
 
 		// add some ambient lighting
